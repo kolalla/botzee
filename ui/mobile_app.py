@@ -337,30 +337,73 @@ def display_mobile_dice():
     if not st.session_state.current_dice:
         st.info("👆 Tap 'Roll Dice' to start your turn!")
     
-    # Dice grid
-    dice_html = '<div class="dice-container"><div class="dice-grid">'
-    
-    for i in range(5):
-        if len(st.session_state.current_dice) > i:
-            dice_value = st.session_state.current_dice[i]
-            is_selected = i in st.session_state.selected_dice
-            selected_class = "selected" if is_selected else ""
-            
-            dice_html += f'''
-            <div class="dice-item">
-                <div class="die {selected_class}" onclick="toggleDie({i})">
-                    {dice_value}
-                </div>
-            </div>
-            '''
-        else:
-            dice_html += '''
-            <div class="dice-item">
-                <div class="die empty">?</div>
-            </div>
-            '''
-    
-    dice_html += '</div>'
+    # Display dice using Streamlit columns instead of raw HTML
+    if st.session_state.current_dice:
+        st.markdown("### 🎲 Current Roll")
+        
+        # Dice display
+        cols = st.columns(5)
+        for i in range(5):
+            with cols[i]:
+                if len(st.session_state.current_dice) > i:
+                    dice_value = st.session_state.current_dice[i]
+                    is_selected = i in st.session_state.selected_dice
+                    
+                    # Create visual dice with CSS styling
+                    border_color = "#27ae60" if is_selected else "#333"
+                    background_color = "#e8f5e8" if is_selected else "white"
+                    
+                    st.markdown(f"""
+                        <div style="
+                            width: 50px; 
+                            height: 50px; 
+                            border: 3px solid {border_color}; 
+                            border-radius: 8px; 
+                            display: flex; 
+                            align-items: center; 
+                            justify-content: center; 
+                            font-size: 20px; 
+                            font-weight: bold;
+                            background-color: {background_color};
+                            margin: 5px auto;
+                            color: black;
+                        ">
+                            {dice_value}
+                        </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.markdown("""
+                        <div style="
+                            width: 50px; 
+                            height: 50px; 
+                            border: 2px solid #bdc3c7; 
+                            border-radius: 8px; 
+                            display: flex; 
+                            align-items: center; 
+                            justify-content: center; 
+                            font-size: 20px; 
+                            background-color: #ecf0f1;
+                            margin: 5px auto;
+                            color: #95a5a6;
+                        ">?</div>
+                    """, unsafe_allow_html=True)
+        
+        # Dice selection checkboxes
+        st.write("**Keep these dice for next roll:**")
+        cols = st.columns(5)
+        for i, die_value in enumerate(st.session_state.current_dice):
+            with cols[i]:
+                is_selected = st.checkbox(
+                    f"Keep {die_value}", 
+                    key=f"mobile_dice_{i}",
+                    value=i in st.session_state.selected_dice,
+                    label_visibility="collapsed"
+                )
+                
+                if is_selected and i not in st.session_state.selected_dice:
+                    st.session_state.selected_dice.append(i)
+                elif not is_selected and i in st.session_state.selected_dice:
+                    st.session_state.selected_dice.remove(i)
     
     # Action buttons
     col1, col2 = st.columns(2)
@@ -379,37 +422,6 @@ def display_mobile_dice():
         if st.session_state.current_dice and st.session_state.turn_started:
             if st.button("📊 View Scores", use_container_width=True):
                 st.info("👇 Tap a score below to choose!")
-    
-    dice_html += '</div>'
-    
-    # Add JavaScript for dice selection
-    dice_html += f'''
-    <script>
-    function toggleDie(index) {{
-        // This would need to be handled through Streamlit callbacks
-        // For now, we'll use the checkbox approach below
-    }}
-    </script>
-    '''
-    
-    st.markdown(dice_html, unsafe_allow_html=True)
-    
-    # Dice selection checkboxes (hidden but functional)
-    if st.session_state.current_dice:
-        st.write("**Keep these dice for next roll:**")
-        cols = st.columns(5)
-        for i, die_value in enumerate(st.session_state.current_dice):
-            with cols[i]:
-                is_selected = st.checkbox(
-                    f"{die_value}", 
-                    key=f"mobile_dice_{i}",
-                    value=i in st.session_state.selected_dice
-                )
-                
-                if is_selected and i not in st.session_state.selected_dice:
-                    st.session_state.selected_dice.append(i)
-                elif not is_selected and i in st.session_state.selected_dice:
-                    st.session_state.selected_dice.remove(i)
 
 def display_mobile_scorecard():
     st.markdown('<div class="scorecard">', unsafe_allow_html=True)
