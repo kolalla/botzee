@@ -1,0 +1,1 @@
+# Botzee AI mode endpoints
