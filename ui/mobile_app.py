@@ -298,50 +298,68 @@ def load_mobile_css():
         transform: scale(1.05);
     }
     
-    /* Dice area styling - only first 5 columns (dice area) */
+    /* Dice area styling - white squares with rounded edges */
     .main .block-container > div > div:first-child .stColumn:nth-child(-n+5) .stButton > button {
         height: 60px;
         min-width: 60px;
-        border-radius: 12px;
-        font-size: 20px;
+        width: 60px;
+        border-radius: 8px;
+        font-size: 18px;
         font-weight: bold;
         margin: 0 auto;
         border: 2px solid #333;
+        background: white !important;
+        color: black !important;
     }
     
-    /* Selected dice (primary buttons) in dice area only */
+    /* Selected dice (primary buttons) - green background */
     .main .block-container > div > div:first-child .stColumn:nth-child(-n+5) .stButton > button[kind="primary"] {
         background: #27ae60 !important;
         border-color: #27ae60 !important;
         color: white !important;
     }
     
-    /* Unselected dice (secondary buttons) in dice area only */  
+    /* Unselected dice (secondary buttons) - white background with black text */  
     .main .block-container > div > div:first-child .stColumn:nth-child(-n+5) .stButton > button[kind="secondary"] {
         background: white !important;
         border-color: #333 !important;
-        color: #333 !important;
+        color: black !important;
     }
     
-    .main .block-container > div > div:first-child .stColumn:nth-child(-n+5) .stButton > button:hover {
-        transform: scale(1.1);
+    /* Empty dice slots - disabled styling */
+    .main .block-container > div > div:first-child .stColumn:nth-child(-n+5) .stButton > button:disabled {
+        background: #f8f9fa !important;
+        border-color: #ddd !important;
+        color: #ccc !important;
+    }
+    
+    .main .block-container > div > div:first-child .stColumn:nth-child(-n+5) .stButton > button:hover:not(:disabled) {
+        transform: scale(1.05);
         border-width: 3px;
     }
     
-    /* Score buttons - subtle styling */
+    /* Score buttons in scorecard - make them compact */
+    /* Target buttons that contain score_ in their key (score buttons) */
     .stButton > button[data-testid*="score"] {
         background: transparent !important;
-        border: 1px solid #e9ecef !important;
+        border: none !important;
         color: #95a5a6 !important;
-        font-style: italic;
-        border-radius: 4px;
-        padding: 4px 8px;
+        font-style: italic !important;
+        border-radius: 4px !important;
+        padding: 1px 4px !important;
+        height: 18px !important;
+        min-height: 18px !important;
+        max-height: 18px !important;
+        font-size: 10px !important;
+        line-height: 1 !important;
+        margin: 0 !important;
+        width: 100% !important;
     }
     
     .stButton > button[data-testid*="score"]:hover {
         background: #f8f9fa !important;
         color: #3498db !important;
-        transform: none;
+        transform: none !important;
     }
     
     /* Scorecard table styling */
@@ -381,6 +399,12 @@ def load_mobile_css():
     .stColumn {
         padding-left: 0.25rem;
         padding-right: 0.25rem;
+        text-align: center;
+    }
+    
+    /* Center align all scorecard numbers */
+    .stColumn p, .stColumn div {
+        text-align: center;
     }
     
     /* Responsive text */
@@ -451,6 +475,7 @@ def get_dice_pips(value):
         # Empty dice slot styling
         empty_style = base_style.replace("border: 3px solid #333", "border: 2px solid #bdc3c7").replace("background: white", "background: #ecf0f1") + " place-items: center;"
         return f'<div style="{empty_style}"><span style="color: #95a5a6; font-size: 20px;">?</span></div>'
+
 
 def initialize_session_state():
     if 'player1_scorecard' not in st.session_state:
@@ -528,8 +553,8 @@ def display_mobile_dice():
                         st.session_state.selected_dice.append(i)
                     st.rerun()
             else:
-                # Empty dice slot - show disabled button
-                st.button("?", key=f"empty_dice_{i}", disabled=True, use_container_width=True)
+                # Empty dice slot - show blank disabled button
+                st.button("", key=f"empty_dice_{i}", disabled=True, use_container_width=True)
     
 
 def display_mobile_scorecard():
@@ -623,11 +648,14 @@ def display_table_score_row(name, category, scorecards):
                 # Confirmed score - bold and normal color
                 st.markdown(f"**{score}**")
             elif st.session_state.current_dice and can_score:
-                # Show potential score with button
+                # Show potential score with custom HTML button
                 dice_roll = DiceRoll(st.session_state.current_dice)
                 possible_score = ScoreCalculator.calculate_score(category, dice_roll)
                 
-                # Small button for scoring
+                # Create unique button ID
+                button_id = f"score_{player_name.replace(' ', '_')}_{category.value}"
+                
+                # Simple Streamlit button - we'll use CSS to make it compact
                 if st.button(f"{possible_score}", key=f"score_{player_name}_{category.value}", 
                            use_container_width=True):
                     confirm_score_dialog(player_name, category, possible_score, scorecard, dice_roll)
@@ -776,6 +804,7 @@ def main():
     add_pwa_meta()
     load_mobile_css()
     initialize_session_state()
+    
     
     # Remove header for space
     # display_mobile_header()
