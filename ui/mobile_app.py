@@ -267,6 +267,7 @@ def load_mobile_css():
         margin-top: 1rem;
     }
     
+    
     /* Chat section */
     .chat-container {
         background: white;
@@ -297,6 +298,91 @@ def load_mobile_css():
         transform: scale(1.05);
     }
     
+    /* Dice area styling - only first 5 columns (dice area) */
+    .main .block-container > div > div:first-child .stColumn:nth-child(-n+5) .stButton > button {
+        height: 60px;
+        min-width: 60px;
+        border-radius: 12px;
+        font-size: 20px;
+        font-weight: bold;
+        margin: 0 auto;
+        border: 2px solid #333;
+    }
+    
+    /* Selected dice (primary buttons) in dice area only */
+    .main .block-container > div > div:first-child .stColumn:nth-child(-n+5) .stButton > button[kind="primary"] {
+        background: #27ae60 !important;
+        border-color: #27ae60 !important;
+        color: white !important;
+    }
+    
+    /* Unselected dice (secondary buttons) in dice area only */  
+    .main .block-container > div > div:first-child .stColumn:nth-child(-n+5) .stButton > button[kind="secondary"] {
+        background: white !important;
+        border-color: #333 !important;
+        color: #333 !important;
+    }
+    
+    .main .block-container > div > div:first-child .stColumn:nth-child(-n+5) .stButton > button:hover {
+        transform: scale(1.1);
+        border-width: 3px;
+    }
+    
+    /* Score buttons - subtle styling */
+    .stButton > button[data-testid*="score"] {
+        background: transparent !important;
+        border: 1px solid #e9ecef !important;
+        color: #95a5a6 !important;
+        font-style: italic;
+        border-radius: 4px;
+        padding: 4px 8px;
+    }
+    
+    .stButton > button[data-testid*="score"]:hover {
+        background: #f8f9fa !important;
+        color: #3498db !important;
+        transform: none;
+    }
+    
+    /* Scorecard table styling */
+    .scorecard-table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    
+    .scorecard-table td {
+        border-right: 1px solid #e9ecef;
+        padding: 0.25rem;
+        text-align: center;
+    }
+    
+    .scorecard-table td:last-child {
+        border-right: none;
+    }
+    
+    .potential-score {
+        color: #95a5a6;
+        font-style: italic;
+        font-weight: normal;
+        cursor: pointer;
+    }
+    
+    .potential-score:hover {
+        color: #3498db;
+        text-decoration: underline;
+    }
+    
+    /* Scorecard column barriers */
+    .stColumn:not(:last-child) {
+        border-right: 1px solid #e9ecef;
+        padding-right: 0.5rem;
+    }
+    
+    .stColumn {
+        padding-left: 0.25rem;
+        padding-right: 0.25rem;
+    }
+    
     /* Responsive text */
     @media (max-width: 390px) {
         .main .block-container {
@@ -315,6 +401,56 @@ def load_mobile_css():
     }
     </style>
     """, unsafe_allow_html=True)
+
+def get_dice_pips(value):
+    """Return HTML for dice with correct number of pips using CSS grid."""
+    base_style = "width: 50px; height: 50px; border: 3px solid #333; border-radius: 8px; background: white; display: grid; margin: 0 auto; position: relative;"
+    
+    # Define pip patterns using CSS grid
+    if value == 1:
+        return f'''<div style="{base_style} place-items: center;">
+                    <div style="width: 8px; height: 8px; background: #333; border-radius: 50%;"></div>
+                   </div>'''
+    elif value == 2:
+        return f'''<div style="{base_style} grid-template-columns: 1fr 1fr; place-items: center;">
+                    <div style="width: 6px; height: 6px; background: #333; border-radius: 50%; margin-top: 8px;"></div>
+                    <div style="width: 6px; height: 6px; background: #333; border-radius: 50%; margin-bottom: 8px;"></div>
+                   </div>'''
+    elif value == 3:
+        return f'''<div style="{base_style} grid-template-columns: 1fr 1fr; place-items: center;">
+                    <div style="width: 6px; height: 6px; background: #333; border-radius: 50%; margin-top: 6px;"></div>
+                    <div style="width: 6px; height: 6px; background: #333; border-radius: 50%;"></div>
+                    <div style="width: 6px; height: 6px; background: #333; border-radius: 50%; margin-bottom: 6px;"></div>
+                   </div>'''
+    elif value == 4:
+        return f'''<div style="{base_style} grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; place-items: center; gap: 6px; padding: 8px;">
+                    <div style="width: 6px; height: 6px; background: #333; border-radius: 50%;"></div>
+                    <div style="width: 6px; height: 6px; background: #333; border-radius: 50%;"></div>
+                    <div style="width: 6px; height: 6px; background: #333; border-radius: 50%;"></div>
+                    <div style="width: 6px; height: 6px; background: #333; border-radius: 50%;"></div>
+                   </div>'''
+    elif value == 5:
+        return f'''<div style="{base_style} grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; place-items: center; gap: 2px; padding: 6px;">
+                    <div style="width: 5px; height: 5px; background: #333; border-radius: 50%;"></div>
+                    <div style="width: 5px; height: 5px; background: #333; border-radius: 50%;"></div>
+                    <div></div>
+                    <div style="width: 5px; height: 5px; background: #333; border-radius: 50%; grid-column: span 2; justify-self: center;"></div>
+                    <div style="width: 5px; height: 5px; background: #333; border-radius: 50%;"></div>
+                    <div style="width: 5px; height: 5px; background: #333; border-radius: 50%;"></div>
+                   </div>'''
+    elif value == 6:
+        return f'''<div style="{base_style} grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; place-items: center; gap: 4px; padding: 6px;">
+                    <div style="width: 5px; height: 5px; background: #333; border-radius: 50%;"></div>
+                    <div style="width: 5px; height: 5px; background: #333; border-radius: 50%;"></div>
+                    <div style="width: 5px; height: 5px; background: #333; border-radius: 50%;"></div>
+                    <div style="width: 5px; height: 5px; background: #333; border-radius: 50%;"></div>
+                    <div style="width: 5px; height: 5px; background: #333; border-radius: 50%;"></div>
+                    <div style="width: 5px; height: 5px; background: #333; border-radius: 50%;"></div>
+                   </div>'''
+    else:
+        # Empty dice slot styling
+        empty_style = base_style.replace("border: 3px solid #333", "border: 2px solid #bdc3c7").replace("background: white", "background: #ecf0f1") + " place-items: center;"
+        return f'<div style="{empty_style}"><span style="color: #95a5a6; font-size: 20px;">?</span></div>'
 
 def initialize_session_state():
     if 'player1_scorecard' not in st.session_state:
@@ -339,8 +475,6 @@ def initialize_session_state():
         st.session_state.turn_started = False
     if 'confirm_score' not in st.session_state:
         st.session_state.confirm_score = None
-    if 'active_scorecard_tab' not in st.session_state:
-        st.session_state.active_scorecard_tab = "Player 1"
 
 def display_mobile_header():
     # Remove the header entirely for space saving
@@ -354,7 +488,10 @@ def display_turn_info():
         st.write(f"**🎯 {st.session_state.current_turn}**")
     
     with col2:
-        st.write(f"**🎲 {st.session_state.rolls_left}**")
+        if st.session_state.rolls_left == 0 and st.session_state.current_dice:
+            st.write("**Choose your score!**")
+        else:
+            st.write(f"**Rolls left: {st.session_state.rolls_left}**")
     
     with col3:
         if not st.session_state.turn_started:
@@ -366,94 +503,46 @@ def display_turn_info():
         else:
             st.button("🎲 No Rolls Left", disabled=True, use_container_width=True)
 
+
 def display_mobile_dice():
-    if not st.session_state.current_dice:
-        st.info("👆 Tap 'Roll Dice' to start your turn!")
+    # Always show 5 dice at the top, regardless of game state
+    cols = st.columns(5)
     
-    # Display dice using Streamlit columns instead of raw HTML
-    if st.session_state.current_dice:
-        st.markdown("### 🎲 Current Roll")
-        
-        # Dice display with clickable selection
-        cols = st.columns(5)
-        for i in range(5):
-            with cols[i]:
-                if len(st.session_state.current_dice) > i:
-                    dice_value = st.session_state.current_dice[i]
-                    is_selected = i in st.session_state.selected_dice
-                    
-                    # Create clickable dice button
-                    button_style = "primary" if is_selected else "secondary"
-                    button_text = f"🎲 {dice_value}"
-                    
-                    if st.button(
-                        button_text,
-                        key=f"dice_select_{i}",
-                        type=button_style,
-                        use_container_width=True
-                    ):
-                        if i in st.session_state.selected_dice:
-                            st.session_state.selected_dice.remove(i)
-                        else:
-                            st.session_state.selected_dice.append(i)
-                        st.rerun()
-                else:
-                    st.markdown("""
-                        <div style="
-                            width: 50px; 
-                            height: 50px; 
-                            border: 2px solid #bdc3c7; 
-                            border-radius: 8px; 
-                            display: flex; 
-                            align-items: center; 
-                            justify-content: center; 
-                            font-size: 20px; 
-                            background-color: #ecf0f1;
-                            margin: 5px auto;
-                            color: #95a5a6;
-                        ">?</div>
-                    """, unsafe_allow_html=True)
-        
-        # Show selected dice info or final roll message
-        if st.session_state.rolls_left == 0:
-            st.info("🎯 No more rolls! Choose your score below.")
-        elif st.session_state.selected_dice:
-            selected_values = [st.session_state.current_dice[i] for i in st.session_state.selected_dice]
-            st.info(f"🔒 Keeping: {', '.join(map(str, selected_values))}")
+    # Create dice as clickable buttons
+    for i in range(5):
+        with cols[i]:
+            if st.session_state.current_dice and len(st.session_state.current_dice) > i:
+                # Show actual dice with values as buttons
+                dice_value = st.session_state.current_dice[i]
+                is_selected = i in st.session_state.selected_dice
+                
+                # Create dice button with selection styling
+                button_type = "primary" if is_selected else "secondary"
+                button_text = str(dice_value)
+                
+                if st.button(button_text, key=f"dice_btn_{i}", type=button_type, use_container_width=True):
+                    # Toggle selection when clicked
+                    if i in st.session_state.selected_dice:
+                        st.session_state.selected_dice.remove(i)
+                    else:
+                        st.session_state.selected_dice.append(i)
+                    st.rerun()
+            else:
+                # Empty dice slot - show disabled button
+                st.button("?", key=f"empty_dice_{i}", disabled=True, use_container_width=True)
     
-    # Remove redundant action buttons since they're now in turn info
 
 def display_mobile_scorecard():
-    # Remove scorecard header banner for space
+    # Traditional Yahtzee scorecard table layout
     
-    # Tabs for each player
-    col1, col2, col3 = st.columns(3)
+    # All scorecards and player info
+    scorecards = [
+        ("Player 1", st.session_state.player1_scorecard, st.session_state.current_turn == "Player 1"),
+        ("Player 2", st.session_state.player2_scorecard, st.session_state.current_turn == "Player 2"),
+        ("Botzee", st.session_state.botzee_scorecard, st.session_state.current_turn == "Botzee")
+    ]
     
-    with col1:
-        if st.button("Player 1", key="tab_p1", use_container_width=True):
-            st.session_state.active_scorecard_tab = "Player 1"
-    with col2:
-        if st.button("Player 2", key="tab_p2", use_container_width=True):
-            st.session_state.active_scorecard_tab = "Player 2"
-    with col3:
-        if st.button("Botzee", key="tab_botzee", use_container_width=True):
-            st.session_state.active_scorecard_tab = "Botzee"
-    
-    # Get the active scorecard
-    if st.session_state.active_scorecard_tab == "Player 1":
-        active_card = st.session_state.player1_scorecard
-        can_score = st.session_state.current_turn == "Player 1"
-    elif st.session_state.active_scorecard_tab == "Player 2":
-        active_card = st.session_state.player2_scorecard
-        can_score = st.session_state.current_turn == "Player 2"
-    else:
-        active_card = st.session_state.botzee_scorecard
-        can_score = st.session_state.current_turn == "Botzee"
-    
-    st.markdown(f"### {st.session_state.active_scorecard_tab}")
-    
-    # Upper section
-    st.markdown("**Upper Section**")
+    # Score categories
     upper_categories = [
         ("Ones", ScoreCategory.ONES),
         ("Twos", ScoreCategory.TWOS),
@@ -463,25 +552,6 @@ def display_mobile_scorecard():
         ("Sixes", ScoreCategory.SIXES)
     ]
     
-    for name, category in upper_categories:
-        display_score_row(name, category, active_card, can_score)
-    
-    # Upper totals
-    st.markdown("---")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.write("**Upper Total:**")
-    with col2:
-        st.write(f"**{active_card.get_upper_section_total()}**")
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        st.write("**Bonus (+35):**")
-    with col2:
-        st.write(f"**{active_card.get_upper_section_bonus()}**")
-    
-    # Lower section
-    st.markdown("**Lower Section**")
     lower_categories = [
         ("Three of a Kind", ScoreCategory.THREE_OF_A_KIND),
         ("Four of a Kind", ScoreCategory.FOUR_OF_A_KIND),
@@ -492,24 +562,113 @@ def display_mobile_scorecard():
         ("Chance", ScoreCategory.CHANCE)
     ]
     
+    # Create table header
+    col_score, col_p1, col_p2, col_botzee = st.columns([2, 1, 1, 1])
+    
+    with col_score:
+        st.markdown("**Category**")
+    with col_p1:
+        if scorecards[0][2]:  # is current turn
+            st.markdown("**🎯 Player 1**")
+        else:
+            st.markdown("**Player 1**")
+    with col_p2:
+        if scorecards[1][2]:  # is current turn
+            st.markdown("**🎯 Player 2**")
+        else:
+            st.markdown("**Player 2**")
+    with col_botzee:
+        if scorecards[2][2]:  # is current turn
+            st.markdown("**🎯 Botzee**")
+        else:
+            st.markdown("**Botzee**")
+    
+    st.markdown("---")
+    
+    # Upper section
+    st.markdown("**UPPER SECTION**")
+    for name, category in upper_categories:
+        display_table_score_row(name, category, scorecards)
+    
+    # Upper totals
+    st.markdown("---")
+    display_table_total_row("Upper Total", "get_upper_section_total", scorecards)
+    display_table_total_row("Bonus (+35)", "get_upper_section_bonus", scorecards)
+    
+    st.markdown("---")
+    st.markdown("**LOWER SECTION**")
+    
+    # Lower section
     for name, category in lower_categories:
-        display_score_row(name, category, active_card, can_score)
+        display_table_score_row(name, category, scorecards)
     
     # Final totals
     st.markdown("---")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.write("**Yahtzee Bonus:**")
-    with col2:
-        st.write(f"**{active_card.get_yahtzee_bonus_total()}**")
+    display_table_total_row("Yahtzee Bonus", "get_yahtzee_bonus_total", scorecards)
+    display_table_total_row("**GRAND TOTAL**", "get_grand_total", scorecards, bold=True)
+
+def display_table_score_row(name, category, scorecards):
+    """Display a table row for score categories."""
+    col_score, col_p1, col_p2, col_botzee = st.columns([2, 1, 1, 1])
     
-    col1, col2 = st.columns(2)
-    with col1:
-        st.write("**GRAND TOTAL:**")
-    with col2:
-        st.write(f"**{active_card.get_grand_total()}**")
+    with col_score:
+        st.write(name)
     
-    st.markdown('</div>', unsafe_allow_html=True)
+    # For each player column
+    for i, (player_name, scorecard, can_score) in enumerate(scorecards):
+        col = [col_p1, col_p2, col_botzee][i]
+        with col:
+            score = scorecard.get_category_score(category)
+            if score is not None:
+                # Confirmed score - bold and normal color
+                st.markdown(f"**{score}**")
+            elif st.session_state.current_dice and can_score:
+                # Show potential score with button
+                dice_roll = DiceRoll(st.session_state.current_dice)
+                possible_score = ScoreCalculator.calculate_score(category, dice_roll)
+                
+                # Small button for scoring
+                if st.button(f"{possible_score}", key=f"score_{player_name}_{category.value}", 
+                           use_container_width=True):
+                    confirm_score_dialog(player_name, category, possible_score, scorecard, dice_roll)
+                    st.rerun()
+            else:
+                # Empty cell
+                st.write("")
+
+def display_table_total_row(label, method_name, scorecards, bold=False):
+    """Display a table row for totals."""
+    col_score, col_p1, col_p2, col_botzee = st.columns([2, 1, 1, 1])
+    
+    with col_score:
+        if bold:
+            st.markdown(label)
+        else:
+            st.write(label)
+    
+    # For each player column
+    for i, (player_name, scorecard, can_score) in enumerate(scorecards):
+        col = [col_p1, col_p2, col_botzee][i]
+        with col:
+            total = getattr(scorecard, method_name)()
+            if bold:
+                st.markdown(f"**{total}**")
+            else:
+                st.write(f"**{total}**")
+
+def display_compact_score_row(name, category, scorecard, can_score, player_name):
+    """Display a compact score row for the three-column layout."""
+    score = scorecard.get_category_score(category)
+    if score is not None:
+        st.write(f"{name}: **{score}**")
+    elif st.session_state.current_dice and can_score:
+        dice_roll = DiceRoll(st.session_state.current_dice)
+        possible_score = ScoreCalculator.calculate_score(category, dice_roll)
+        if st.button(f"{name}: {possible_score}", key=f"score_{player_name}_{category.value}", use_container_width=True):
+            confirm_score_dialog(player_name, category, possible_score, scorecard, dice_roll)
+            st.rerun()
+    else:
+        st.write(f"{name}: —")
 
 def display_score_row(name, category, scorecard, can_score):
     col1, col2 = st.columns([2, 1])
@@ -608,8 +767,9 @@ def end_turn():
     st.session_state.selected_dice = []
     st.session_state.turn_started = False
     st.session_state.confirm_score = None
-    # Auto-switch scorecard tab to current player
-    st.session_state.active_scorecard_tab = st.session_state.current_turn
+    # Clear scoring options when turn ends
+    if 'scoring_options' in st.session_state:
+        st.session_state.scoring_options = {}
     st.rerun()
 
 def main():
