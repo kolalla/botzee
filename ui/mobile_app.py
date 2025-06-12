@@ -17,14 +17,39 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# PWA Configuration
+def add_pwa_meta():
+    st.markdown("""
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Botzee">
+    <link rel="apple-touch-icon" href="./icon-192x192.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then(function(registration) {
+            console.log('ServiceWorker registration successful');
+          }, function(err) {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+      });
+    }
+    </script>
+    """, unsafe_allow_html=True)
+
 # Mobile-first CSS styling
 def load_mobile_css():
     st.markdown("""
     <style>
-    /* iPhone 14/15 specific styling */
+    /* iPhone 14/15 specific styling - more compact */
     .main .block-container {
         max-width: 390px;
-        padding: 1rem 0.5rem;
+        padding: 0.25rem 0.5rem;
         margin: 0 auto;
     }
     
@@ -318,20 +343,28 @@ def initialize_session_state():
         st.session_state.active_scorecard_tab = "Player 1"
 
 def display_mobile_header():
-    st.markdown("""
-    <div class="mobile-header">
-        <h2>🎲 Botzee</h2>
-        <p>AI-Powered Yahtzee</p>
-    </div>
-    """, unsafe_allow_html=True)
+    # Remove the header entirely for space saving
+    pass
 
 def display_turn_info():
-    st.markdown(f"""
-    <div class="turn-info">
-        <div class="turn-player">🎯 {st.session_state.current_turn}'s Turn</div>
-        <div class="rolls-left">🎲 {st.session_state.rolls_left} left</div>
-    </div>
-    """, unsafe_allow_html=True)
+    # Compact turn info in a single line with buttons
+    col1, col2, col3 = st.columns([2, 1, 2])
+    
+    with col1:
+        st.write(f"**🎯 {st.session_state.current_turn}**")
+    
+    with col2:
+        st.write(f"**🎲 {st.session_state.rolls_left}**")
+    
+    with col3:
+        if not st.session_state.turn_started:
+            if st.button("🎲 Roll Dice", type="primary", use_container_width=True):
+                start_turn()
+        elif st.session_state.rolls_left > 0 and st.session_state.current_dice:
+            if st.button("🎲 Next Roll", type="primary", use_container_width=True):
+                next_roll()
+        else:
+            st.button("🎲 No Rolls Left", disabled=True, use_container_width=True)
 
 def display_mobile_dice():
     if not st.session_state.current_dice:
@@ -341,7 +374,7 @@ def display_mobile_dice():
     if st.session_state.current_dice:
         st.markdown("### 🎲 Current Roll")
         
-        # Dice display
+        # Dice display with clickable selection
         cols = st.columns(5)
         for i in range(5):
             with cols[i]:
@@ -349,28 +382,21 @@ def display_mobile_dice():
                     dice_value = st.session_state.current_dice[i]
                     is_selected = i in st.session_state.selected_dice
                     
-                    # Create visual dice with CSS styling
-                    border_color = "#27ae60" if is_selected else "#333"
-                    background_color = "#e8f5e8" if is_selected else "white"
+                    # Create clickable dice button
+                    button_style = "primary" if is_selected else "secondary"
+                    button_text = f"🎲 {dice_value}"
                     
-                    st.markdown(f"""
-                        <div style="
-                            width: 50px; 
-                            height: 50px; 
-                            border: 3px solid {border_color}; 
-                            border-radius: 8px; 
-                            display: flex; 
-                            align-items: center; 
-                            justify-content: center; 
-                            font-size: 20px; 
-                            font-weight: bold;
-                            background-color: {background_color};
-                            margin: 5px auto;
-                            color: black;
-                        ">
-                            {dice_value}
-                        </div>
-                    """, unsafe_allow_html=True)
+                    if st.button(
+                        button_text,
+                        key=f"dice_select_{i}",
+                        type=button_style,
+                        use_container_width=True
+                    ):
+                        if i in st.session_state.selected_dice:
+                            st.session_state.selected_dice.remove(i)
+                        else:
+                            st.session_state.selected_dice.append(i)
+                        st.rerun()
                 else:
                     st.markdown("""
                         <div style="
@@ -388,44 +414,17 @@ def display_mobile_dice():
                         ">?</div>
                     """, unsafe_allow_html=True)
         
-        # Dice selection checkboxes
-        st.write("**Keep these dice for next roll:**")
-        cols = st.columns(5)
-        for i, die_value in enumerate(st.session_state.current_dice):
-            with cols[i]:
-                is_selected = st.checkbox(
-                    f"Keep {die_value}", 
-                    key=f"mobile_dice_{i}",
-                    value=i in st.session_state.selected_dice,
-                    label_visibility="collapsed"
-                )
-                
-                if is_selected and i not in st.session_state.selected_dice:
-                    st.session_state.selected_dice.append(i)
-                elif not is_selected and i in st.session_state.selected_dice:
-                    st.session_state.selected_dice.remove(i)
+        # Show selected dice info or final roll message
+        if st.session_state.rolls_left == 0:
+            st.info("🎯 No more rolls! Choose your score below.")
+        elif st.session_state.selected_dice:
+            selected_values = [st.session_state.current_dice[i] for i in st.session_state.selected_dice]
+            st.info(f"🔒 Keeping: {', '.join(map(str, selected_values))}")
     
-    # Action buttons
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        if not st.session_state.turn_started:
-            if st.button("🎲 Roll Dice", type="primary", use_container_width=True):
-                start_turn()
-        elif st.session_state.rolls_left > 0 and st.session_state.current_dice:
-            if st.button("🎲 Next Roll", type="primary", use_container_width=True):
-                next_roll()
-        else:
-            st.button("🎲 No Rolls Left", disabled=True, use_container_width=True)
-    
-    with col2:
-        if st.session_state.current_dice and st.session_state.turn_started:
-            if st.button("📊 View Scores", use_container_width=True):
-                st.info("👇 Tap a score below to choose!")
+    # Remove redundant action buttons since they're now in turn info
 
 def display_mobile_scorecard():
-    st.markdown('<div class="scorecard">', unsafe_allow_html=True)
-    st.markdown('<div class="scorecard-header">📊 Scorecard</div>', unsafe_allow_html=True)
+    # Remove scorecard header banner for space
     
     # Tabs for each player
     col1, col2, col3 = st.columns(3)
@@ -527,6 +526,7 @@ def display_score_row(name, category, scorecard, can_score):
             possible_score = ScoreCalculator.calculate_score(category, dice_roll)
             if st.button(f"Score {possible_score}", key=f"score_{st.session_state.active_scorecard_tab}_{category.value}", use_container_width=True):
                 confirm_score_dialog(st.session_state.active_scorecard_tab, category, possible_score, scorecard, dice_roll)
+                st.rerun()
         else:
             st.write("—")
 
@@ -563,23 +563,22 @@ def display_confirmation_dialog():
     return False
 
 def display_mobile_chat():
-    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
-    st.markdown("### 💬 Chat with Botzee")
+    # Compact chat section without white bars
+    st.markdown("💬 **Chat with Botzee**")
     
-    # Chat messages
-    st.markdown('<div class="chat-messages">', unsafe_allow_html=True)
-    for message in st.session_state.chat_history[-3:]:  # Show last 3 messages
-        st.write(message)
-    st.markdown('</div>', unsafe_allow_html=True)
+    # Show only last 2 messages compactly
+    for message in st.session_state.chat_history[-2:]:
+        st.write(f"*{message}*")
     
-    # Chat input
-    user_input = st.text_input("Your message:", placeholder="Ask Botzee for help...", label_visibility="collapsed")
-    if st.button("Send", use_container_width=True) and user_input:
-        st.session_state.chat_history.append(f"You: {user_input}")
-        st.session_state.chat_history.append("Botzee: Great question! I'm learning to give better advice.")
-        st.rerun()
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+    # Compact chat input
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        user_input = st.text_input("Message:", placeholder="Ask Botzee...", label_visibility="collapsed")
+    with col2:
+        if st.button("Send") and user_input:
+            st.session_state.chat_history.append(f"You: {user_input}")
+            st.session_state.chat_history.append("Botzee: Great question! I'm learning to give better advice.")
+            st.rerun()
 
 def start_turn():
     roll_result = st.session_state.dice_manager.roll_all_dice()
@@ -591,11 +590,12 @@ def start_turn():
 
 def next_roll():
     if st.session_state.rolls_left > 0:
-        keep_indices = st.session_state.selected_dice
+        keep_indices = st.session_state.selected_dice.copy()
         roll_result = st.session_state.dice_manager.reroll_dice(keep_indices)
         st.session_state.current_dice = roll_result.values
         st.session_state.rolls_left -= 1
-        st.session_state.selected_dice = []
+        # Keep the same selected dice indices after reroll
+        st.session_state.selected_dice = keep_indices
         st.rerun()
 
 def end_turn():
@@ -608,25 +608,25 @@ def end_turn():
     st.session_state.selected_dice = []
     st.session_state.turn_started = False
     st.session_state.confirm_score = None
+    # Auto-switch scorecard tab to current player
+    st.session_state.active_scorecard_tab = st.session_state.current_turn
     st.rerun()
 
 def main():
+    add_pwa_meta()
     load_mobile_css()
     initialize_session_state()
     
-    display_mobile_header()
+    # Remove header for space
+    # display_mobile_header()
     
     # Show confirmation dialog if needed
     if not display_confirmation_dialog():
         display_turn_info()
         
-        st.markdown("---")
+        # Remove dividing lines for more compact layout
         display_mobile_dice()
-        
-        st.markdown("---")
         display_mobile_scorecard()
-        
-        st.markdown("---")
         display_mobile_chat()
 
 if __name__ == "__main__":
