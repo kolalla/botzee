@@ -10,6 +10,9 @@
     "platforms": ["ios", "android", "web"],
     "web": {
       "bundler": "metro"
-    }
+    },
+    "fonts": [
+      "https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+    ]
   }
 }

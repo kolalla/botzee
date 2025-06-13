@@ -208,26 +208,27 @@ const App = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+      <StatusBar barStyle="dark-content" backgroundColor="#e4e1b4" />
       <ScrollView style={styles.scrollView}>
         
-        {/* Turn Info */}
-        <View style={styles.turnInfo}>
-          <Text style={styles.turnInfoText}>{currentPlayer}</Text>
-          <TouchableOpacity 
-            style={[styles.rollButton, !gameStarted || rollsLeft === 0 ? styles.rollButtonDisabled : null]}
-            onPress={gameStarted ? rerollDice : rollDice}
-            disabled={rollsLeft === 0}
-          >
-            <Text style={styles.turnInfoText}>
-              {!gameStarted ? '🎲 Roll Dice' : rollsLeft > 0 ? '🎲 Next Roll' : '🎯 Choose a score!'}
-            </Text>
-          </TouchableOpacity>
-          <Text style={styles.turnInfoText}>Rolls left: {rollsLeft}</Text>
-        </View>
-
-        {/* Dice Section */}
-        <View style={styles.diceContainer}>
+        {/* Action Section (Top) */}
+        <View style={styles.actionSection}>
+          {/* Top Row: Player Info and Roll Button */}
+          <View style={styles.playerInfo}>
+            <Text style={styles.playerInfoText}>{currentPlayer}</Text>
+            <TouchableOpacity 
+              style={[styles.rollButton, !gameStarted || rollsLeft === 0 ? styles.rollButtonDisabled : null]}
+              onPress={gameStarted ? rerollDice : rollDice}
+              disabled={rollsLeft === 0}
+            >
+              <Text style={styles.rollButtonText}>
+                {!gameStarted ? 'Roll Dice' : rollsLeft > 0 ? 'Next Roll' : 'Choose Score'}
+              </Text>
+            </TouchableOpacity>
+            <Text style={styles.playerInfoText}>ROLLS: {rollsLeft}</Text>
+          </View>
+          
+          {/* Dice Grid */}
           <View style={styles.diceGrid}>
             {Array.from({ length: 5 }, (_, index) => (
               <TouchableOpacity
@@ -251,27 +252,23 @@ const App = () => {
           </View>
         </View>
 
-        {/* Scorecard */}
+        {/* Scorecard Section (Middle) */}
         <View style={styles.scorecard}>
-          <View style={styles.scorecardHeader}>
-            <View style={styles.scorecardRow}>
-              <Text style={styles.scorecardHeaderText}></Text>
-              <Text style={[styles.scorecardHeaderText, styles.scorecardHeaderCenter]}>{currentPlayer === 'Player 1' ? '🎯 ' : ''}Player 1</Text>
-              <Text style={[styles.scorecardHeaderText, styles.scorecardHeaderCenter]}>{currentPlayer === 'Player 2' ? '🎯 ' : ''}Player 2</Text>
-              <Text style={[styles.scorecardHeaderText, styles.scorecardHeaderCenter]}>{currentPlayer === 'Botzee' ? '🎯 ' : ''}Botzee</Text>
+          {/* Combined Header: Player Names and Upper Section */}
+          <View style={styles.combinedHeader}>
+            <Text style={styles.sectionTitle}>Upper Section</Text>
+            <View style={styles.playerNamesRow}>
+              <Text style={[styles.scorecardHeaderText, styles.scorecardHeaderCenter]}>{currentPlayer === 'Player 1' ? '>' : ''}P1</Text>
+              <Text style={[styles.scorecardHeaderText, styles.scorecardHeaderCenter]}>{currentPlayer === 'Player 2' ? '>' : ''}P2</Text>
+              <Text style={[styles.scorecardHeaderText, styles.scorecardHeaderCenter]}>{currentPlayer === 'Botzee' ? '>' : ''}BOT</Text>
             </View>
-          </View>
-
-          {/* Upper Section */}
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>UPPER SECTION</Text>
           </View>
           
           {[{name: 'Ones', key: 'ones'}, {name: 'Twos', key: 'twos'}, {name: 'Threes', key: 'threes'}, 
             {name: 'Fours', key: 'fours'}, {name: 'Fives', key: 'fives'}, {name: 'Sixes', key: 'sixes'}].map((category) => (
             <View key={category.key} style={styles.scorecardRow}>
               <Text style={styles.categoryName}>{category.name}</Text>
-              {['Player 1', 'Player 2', 'Botzee'].map(player => {
+              {['Player 1', 'Player 2', 'Botzee'].map((player, index) => {
                 const score = scores[player][category.key as ScoreCategory];
                 const isCurrentPlayer = player === currentPlayer;
                 const potential = isCurrentPlayer && currentDice.length > 0 && score === null ? getPotentialScore(category.key as ScoreCategory) : null;
@@ -279,11 +276,11 @@ const App = () => {
                 return (
                   <TouchableOpacity 
                     key={player}
-                    style={[styles.scoreCell, isCurrentPlayer && score === null && currentDice.length > 0 ? styles.scoreCellActive : null]}
+                    style={[styles.scoreCell, index === 0 ? styles.firstScoreCell : null]}
                     onPress={() => isCurrentPlayer && score === null && currentDice.length > 0 ? scoreCategory(category.key as ScoreCategory) : null}
                     disabled={!isCurrentPlayer || score !== null || currentDice.length === 0}
                   >
-                    <Text style={[styles.scoreValue, potential !== null ? styles.potentialScore : null]}>
+                    <Text style={[styles.scoreValue, potential !== null ? styles.potentialScore : null, score !== null ? styles.actualScore : null]}>
                       {score !== null ? score : (potential !== null ? potential : '—')}
                     </Text>
                   </TouchableOpacity>
@@ -293,27 +290,27 @@ const App = () => {
           ))}
 
           <View style={[styles.scorecardRow, styles.totalRow]}>
-            <Text style={styles.categoryName}>Upper total</Text>
-            {['Player 1', 'Player 2', 'Botzee'].map(player => {
+            <Text style={styles.categoryName}>Upper Total</Text>
+            {['Player 1', 'Player 2', 'Botzee'].map((player, index) => {
               const upperTotal = ['ones', 'twos', 'threes', 'fours', 'fives', 'sixes']
                 .reduce((total, cat) => total + (scores[player][cat as ScoreCategory] || 0), 0);
               return (
-                <View key={player} style={styles.scoreCell}>
-                  <Text style={styles.scoreValue}>{upperTotal}</Text>
+                <View key={player} style={[styles.scoreCell, index === 0 ? styles.firstScoreCell : null]}>
+                  <Text style={[styles.scoreValue, styles.actualScore]}>{upperTotal}</Text>
                 </View>
               );
             })}
           </View>
 
           <View style={[styles.scorecardRow, styles.totalRow]}>
-            <Text style={styles.categoryName}>Bonus (+35)</Text>
-            {['Player 1', 'Player 2', 'Botzee'].map(player => {
+            <Text style={styles.categoryName}>Bonus</Text>
+            {['Player 1', 'Player 2', 'Botzee'].map((player, index) => {
               const upperTotal = ['ones', 'twos', 'threes', 'fours', 'fives', 'sixes']
                 .reduce((total, cat) => total + (scores[player][cat as ScoreCategory] || 0), 0);
               const bonus = upperTotal >= 63 ? 35 : 0;
               return (
-                <View key={player} style={styles.scoreCell}>
-                  <Text style={styles.scoreValue}>{bonus}</Text>
+                <View key={player} style={[styles.scoreCell, index === 0 ? styles.firstScoreCell : null]}>
+                  <Text style={[styles.scoreValue, styles.actualScore]}>{bonus}</Text>
                 </View>
               );
             })}
@@ -321,7 +318,7 @@ const App = () => {
 
           {/* Lower Section */}
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>LOWER SECTION</Text>
+            <Text style={styles.sectionTitle}>Lower Section</Text>
           </View>
 
           {[{name: 'Three of a Kind', key: 'threeOfAKind'}, {name: 'Four of a Kind', key: 'fourOfAKind'}, 
@@ -330,7 +327,7 @@ const App = () => {
             {name: 'Chance', key: 'chance'}].map((category) => (
             <View key={category.key} style={styles.scorecardRow}>
               <Text style={styles.categoryName}>{category.name}</Text>
-              {['Player 1', 'Player 2', 'Botzee'].map(player => {
+              {['Player 1', 'Player 2', 'Botzee'].map((player, index) => {
                 const score = scores[player][category.key as ScoreCategory];
                 const isCurrentPlayer = player === currentPlayer;
                 const potential = isCurrentPlayer && currentDice.length > 0 && score === null ? getPotentialScore(category.key as ScoreCategory) : null;
@@ -338,11 +335,11 @@ const App = () => {
                 return (
                   <TouchableOpacity 
                     key={player}
-                    style={[styles.scoreCell, isCurrentPlayer && score === null && currentDice.length > 0 ? styles.scoreCellActive : null]}
+                    style={[styles.scoreCell, index === 0 ? styles.firstScoreCell : null]}
                     onPress={() => isCurrentPlayer && score === null && currentDice.length > 0 ? scoreCategory(category.key as ScoreCategory) : null}
                     disabled={!isCurrentPlayer || score !== null || currentDice.length === 0}
                   >
-                    <Text style={[styles.scoreValue, potential !== null ? styles.potentialScore : null]}>
+                    <Text style={[styles.scoreValue, potential !== null ? styles.potentialScore : null, score !== null ? styles.actualScore : null]}>
                       {score !== null ? score : (potential !== null ? potential : '—')}
                     </Text>
                   </TouchableOpacity>
@@ -353,16 +350,16 @@ const App = () => {
 
           <View style={[styles.scorecardRow, styles.totalRow]}>
             <Text style={styles.categoryName}>Yahtzee Bonus</Text>
-            {['Player 1', 'Player 2', 'Botzee'].map(player => (
-              <View key={player} style={styles.scoreCell}>
-                <Text style={styles.scoreValue}>0</Text>
+            {['Player 1', 'Player 2', 'Botzee'].map((player, index) => (
+              <View key={player} style={[styles.scoreCell, index === 0 ? styles.firstScoreCell : null]}>
+                <Text style={[styles.scoreValue, styles.actualScore]}>0</Text>
               </View>
             ))}
           </View>
 
           <View style={[styles.scorecardRow, styles.totalRow, styles.grandTotalRow]}>
-            <Text style={[styles.categoryName, styles.grandTotalText]}>GRAND TOTAL</Text>
-            {['Player 1', 'Player 2', 'Botzee'].map(player => {
+            <Text style={[styles.categoryName, styles.grandTotalText]}>Grand Total</Text>
+            {['Player 1', 'Player 2', 'Botzee'].map((player, index) => {
               const upperTotal = ['ones', 'twos', 'threes', 'fours', 'fives', 'sixes']
                 .reduce((total, cat) => total + (scores[player][cat as ScoreCategory] || 0), 0);
               const upperBonus = upperTotal >= 63 ? 35 : 0;
@@ -371,17 +368,17 @@ const App = () => {
               const grandTotal = upperTotal + upperBonus + lowerTotal;
               
               return (
-                <View key={player} style={styles.scoreCell}>
-                  <Text style={[styles.scoreValue, styles.grandTotalText]}>{grandTotal}</Text>
+                <View key={player} style={[styles.scoreCell, index === 0 ? styles.firstScoreCell : null]}>
+                  <Text style={[styles.scoreValue, styles.grandTotalText, styles.actualScore]}>{grandTotal}</Text>
                 </View>
               );
             })}
           </View>
         </View>
 
-        {/* Chat Section */}
+        {/* Chat Section (Bottom) */}
         <View style={styles.chatContainer}>
-          <Text style={styles.chatTitle}>💬 Chat with Botzee</Text>
+          <Text style={styles.chatTitle}>Botzee Chat</Text>
           <ScrollView 
             ref={chatScrollRef}
             style={styles.chatMessages}
@@ -393,14 +390,15 @@ const App = () => {
                 styles.chatMessage,
                 message.sender === 'player' ? styles.playerMessage : styles.botzeeMessage
               ]}>
-                {message.sender === 'botzee' ? 'Botzee: ' : 'You: '}{message.text}
+                {message.sender === 'botzee' ? 'Bot: ' : 'You: '}{message.text}
               </Text>
             ))}
           </ScrollView>
           <View style={styles.chatInputContainer}>
             <TextInput
               style={styles.chatInput}
-              placeholder="Ask Botzee..."
+              placeholder="Ask Bot..."
+              placeholderTextColor="#666666"
               value={chatInput}
               onChangeText={setChatInput}
               onSubmitEditing={sendMessage}
@@ -423,123 +421,150 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a', // Dark background like the image
+    backgroundColor: '#e4e1b4', // Game Boy yellow-green background
+    maxWidth: 420, // Slightly wider than iPhone width
+    alignSelf: 'center',
   },
   scrollView: {
-    backgroundColor: '#1a1a1a',
-    padding: 16,
+    backgroundColor: '#e4e1b4',
+    padding: 8,
   },
   
-  // Turn Info Section
-  turnInfo: {
-    backgroundColor: '#2a2a2a',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
+  // Action Section (Top)
+  actionSection: {
+    backgroundColor: '#e4e1b4',
+    borderWidth: 3,
+    borderColor: '#000000',
+    padding: 8,
+    marginBottom: 6,
+  },
+  playerInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 8,
   },
-  turnInfoText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
-    flex: 1,
-    textAlign: 'center',
+  playerInfoText: {
+    color: '#000000',
+    fontSize: 14,
+    fontFamily: 'PressStart2P-Regular',
   },
   rollButton: {
-    backgroundColor: '#e74c3c',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    flex: 1,
-    alignItems: 'center',
-    marginHorizontal: 8,
+    backgroundColor: '#ff0000',
+    borderWidth: 3,
+    borderColor: '#000000',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    alignSelf: 'center',
   },
   rollButtonDisabled: {
     backgroundColor: '#666666',
   },
+  rollButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontFamily: 'PressStart2P-Regular',
+  },
 
   // Dice Section
   diceContainer: {
-    backgroundColor: '#2a2a2a',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: '#e4e1b4',
+    borderWidth: 3,
+    borderColor: '#000000',
+    padding: 8,
+    marginBottom: 6,
   },
   diceGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 8,
   },
   die: {
     width: 50,
     height: 50,
     borderWidth: 3,
-    borderColor: '#ffffff',
-    borderRadius: 8,
+    borderColor: '#000000',
     backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
   },
   dieEmpty: {
-    borderColor: '#666666',
-    backgroundColor: '#3a3a3a',
+    backgroundColor: '#cccccc',
   },
   dieSelected: {
-    borderColor: '#27ae60',
-    backgroundColor: '#e8f5e8',
+    backgroundColor: '#ffff00',
   },
   dieText: {
     fontSize: 20,
-    fontWeight: 'bold',
     color: '#000000',
+    fontFamily: 'PressStart2P-Regular',
   },
   dieTextEmpty: {
     color: '#666666',
   },
 
-  // Scorecard Section
+  // Scorecard Section (Middle)
   scorecard: {
-    backgroundColor: '#2a2a2a',
-    borderRadius: 12,
-    marginBottom: 16,
-    overflow: 'hidden',
+    backgroundColor: '#e4e1b4',
+    borderWidth: 3,
+    borderColor: '#000000',
+    marginBottom: 8,
   },
   scorecardHeader: {
-    backgroundColor: '#3a3a3a',
-    paddingVertical: 12,
+    backgroundColor: '#e4e1b4',
+    paddingVertical: 4,
   },
   scorecardRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#444444',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderBottomWidth: 2,
+    borderBottomColor: '#000000',
+    backgroundColor: '#e4e1b4',
   },
   scorecardHeaderText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: 12,
-    flex: 2,
+    color: '#000000',
+    fontSize: 14,
+    fontFamily: 'PressStart2P-Regular',
   },
   scorecardHeaderCenter: {
-    flex: 1,
     textAlign: 'center',
   },
+  combinedHeader: {
+    backgroundColor: '#e4e1b4',
+    borderBottomWidth: 3,
+    borderBottomColor: '#000000',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  playerNamesRow: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'space-around',
+    marginLeft: 16,
+  },
   sectionHeader: {
-    backgroundColor: '#3a3a3a',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    backgroundColor: '#e4e1b4',
+    borderBottomWidth: 3,
+    borderBottomColor: '#000000',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
   },
   sectionTitle: {
-    color: '#ffffff',
-    fontWeight: 'bold',
+    color: '#000000',
     fontSize: 14,
+    fontFamily: 'PressStart2P-Regular',
+    flex: 0,
+    minWidth: 120,
   },
   categoryName: {
-    color: '#ffffff',
+    color: '#000000',
     fontSize: 14,
+    fontFamily: 'PressStart2P-Regular',
     flex: 2,
   },
   scoreCell: {
@@ -547,66 +572,76 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 4,
+    borderRightWidth: 2,
+    borderRightColor: '#000000',
+  },
+  firstScoreCell: {
+    borderLeftWidth: 2,
+    borderLeftColor: '#000000',
   },
   scoreCellActive: {
-    backgroundColor: '#2a2a2a',
-    borderRadius: 4,
+    backgroundColor: '#e4e1b4',
   },
   scoreValue: {
-    color: '#ffffff',
+    color: '#000000',
     fontSize: 14,
+    fontFamily: 'PressStart2P-Regular',
     textAlign: 'center',
   },
   potentialScore: {
-    color: '#3498db',
+    color: '#000000',
     fontStyle: 'italic',
   },
+  actualScore: {
+    fontWeight: 'bold',
+  },
   totalRow: {
-    backgroundColor: '#3a3a3a',
+    backgroundColor: '#cccccc',
   },
   grandTotalRow: {
-    backgroundColor: '#4a4a4a',
+    backgroundColor: '#aaaaaa',
     borderBottomWidth: 0,
   },
   grandTotalText: {
-    fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 14,
+    fontFamily: 'PressStart2P-Regular',
   },
 
-  // Chat Section
+  // Chat Section (Bottom)
   chatContainer: {
-    backgroundColor: '#2a2a2a',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: '#e4e1b4',
+    borderWidth: 3,
+    borderColor: '#000000',
+    padding: 8,
+    marginBottom: 8,
   },
   chatTitle: {
-    color: '#ffffff',
-    fontWeight: 'bold',
+    color: '#000000',
     fontSize: 16,
-    marginBottom: 12,
+    fontFamily: 'PressStart2P-Regular',
+    marginBottom: 8,
   },
   chatMessages: {
-    backgroundColor: '#3a3a3a',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
-    height: 84, // Fixed height for exactly 3 lines (20px line height + 4px margin = 24px per line, plus padding)
-    maxHeight: 84,
+    backgroundColor: '#ffffff',
+    borderWidth: 2,
+    borderColor: '#000000',
+    padding: 8,
+    marginBottom: 8,
+    height: 100,
+    maxHeight: 100,
   },
   chatMessage: {
-    color: '#ffffff',
-    fontSize: 14,
+    color: '#000000',
+    fontSize: 12,
+    fontFamily: 'PressStart2P-Regular',
     marginBottom: 4,
-    lineHeight: 20,
+    lineHeight: 16,
   },
   playerMessage: {
     textAlign: 'right',
-    color: '#3498db',
   },
   botzeeMessage: {
     textAlign: 'left',
-    fontStyle: 'italic',
   },
   chatInputContainer: {
     flexDirection: 'row',
@@ -614,24 +649,27 @@ const styles = StyleSheet.create({
   },
   chatInput: {
     flex: 1,
-    backgroundColor: '#3a3a3a',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    color: '#ffffff',
-    fontSize: 14,
+    backgroundColor: '#ffffff',
+    borderWidth: 2,
+    borderColor: '#000000',
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    color: '#000000',
+    fontSize: 12,
+    fontFamily: 'PressStart2P-Regular',
   },
   sendButton: {
-    backgroundColor: '#3498db',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
+    backgroundColor: '#ff0000',
+    borderWidth: 2,
+    borderColor: '#000000',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     justifyContent: 'center',
   },
   sendButtonText: {
     color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 13,
+    fontFamily: 'PressStart2P-Regular',
   },
 });
 
