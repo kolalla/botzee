@@ -1,7 +1,26 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(git rm:*)",
+      "Bash(unzip:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(source ~/.bashrc)",
+      "Bash(export:*)",
+      "Bash(sdkmanager:*)",
+      "Bash(npx react-native:*)",
+      "Bash(emulator:*)",
+      "Bash(npx create-expo-app:*)",
+      "Bash(cp:*)",
+      "Bash(npm run ios:*)",
+      "Bash(/home/keith/Android/Sdk/emulator/emulator @Botzee_Phone)",
+      "Bash(/home/keith/Android/Sdk/emulator/emulator @Botzee_Phone -no-audio -no-window)",
+      "Bash(npm install:*)",
+      "Bash(npx expo install:*)",
+      "Bash(npm run web:*)",
+      "Bash(npx expo start:*)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }

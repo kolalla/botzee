@@ -4,90 +4,108 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Architecture
 
-Botzee is an AI-powered Yahtzee game targeting **mobile-first Progressive Web App (PWA)** deployment:
+Botzee is an AI-powered Yahtzee game with **React Native mobile app** and Python backend:
 
-- **FastAPI Backend** (`app/`) - REST API service providing bot and scorekeeping endpoints
-- **Mobile PWA Frontend** (`ui/`) - Mobile-optimized web interface with touch-friendly gameplay
+- **React Native Mobile App** (`mobile/`) - TypeScript mobile app with web support for rapid iteration
+- **FastAPI Backend** (`app/`) - Python REST API for game logic and AI bot
 - **Game Logic Layer** (`app/game/`) - Core Yahtzee mechanics, scoring, and dice management
 
 ### Key Components
 
-- `app/main.py` - FastAPI application entry point (placeholder)
-- `app/api/` - API endpoints for bot gameplay and scorekeeping (placeholder)
+- `mobile/App.tsx` - **Main React Native app** with complete Yahtzee UI
+- `mobile/index.web.js` - Web entry point for browser testing
 - `app/game/` - **Core game logic** (dice.py, game.py, scorecard.py)
-- `app/services/` - Core business logic (AI decisions, score calculations)
-- `app/ml/bot_model.pkl` - Pre-trained ML model for AI bot
-- `ui/app.py` - Desktop Streamlit interface (legacy)
-- `ui/mobile_app.py` - **Mobile-optimized PWA interface** (iPhone 14/15 target)
+- `app/services/` - AI decisions and score calculations
+- `app/ml/bot_model.pkl` - Pre-trained ML model for Botzee AI
+- `app/api/` - REST API endpoints (to be implemented)
+- `ui/` - Legacy Streamlit interfaces (deprecated)
 
 ### Data Flow
-Mobile PWA → Game Logic → [Future: FastAPI endpoints] → Service layer → ML model
+React Native App → FastAPI Backend → Game Logic → AI Service → ML Model
 
 ## Development Commands
 
-### Running the Application
+### Mobile App Development
 
 ```bash
-# Mobile PWA (Primary)
-streamlit run ui/mobile_app.py
+# Install dependencies
+cd mobile && npm install
 
-# Desktop Version (Legacy)
-streamlit run ui/app.py
+# Quick browser testing (recommended for UI iteration)
+cd mobile && npm run web
+# Opens at http://localhost:8081
 
-# Backend (Future API development)
+# Expo Go for device testing
+cd mobile && npx expo start
+# Scan QR code with Expo Go app
+
+# Native development (requires simulators)
+cd mobile && npm run ios     # Requires Xcode on macOS
+cd mobile && npm run android # Requires Android Studio + emulator
+```
+
+### Backend Development
+
+```bash
+# FastAPI Backend
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 
-# Docker
-docker build -t botzee .
-docker run -p 8000:8000 botzee
-```
-
-### Mobile Testing
-
-```bash
-# Run mobile app
-streamlit run ui/mobile_app.py
-
-# Test in browser device simulation:
-# Chrome: F12 → Device Icon → iPhone 14 Pro
-# Firefox: F12 → Device Icon → iPhone 12/13/14
-```
-
-### Testing
-
-```bash
-# Run all tests
+# Run tests
 pytest app/tests/
 
-# Run specific test
+# Specific test
 pytest app/tests/test_score.py
 ```
 
-## Mobile-First Development Plan
+### Legacy Interfaces (Deprecated)
 
-### **Phase 1: PWA Development** (Current)
-- ✅ Core game logic implemented (`app/game/`)
-- ✅ Mobile-responsive UI (`ui/mobile_app.py`)
-- 🔄 Touch-friendly dice selection and scoring
-- 🔄 PWA manifest and service worker
-- 🔄 Mobile optimization and testing
+```bash
+# Streamlit desktop (testing only)
+streamlit run ui/app.py
+```
 
-### **Phase 2: API Integration** (Next)
-- Implement REST API endpoints in `app/api/`
-- Replace direct game logic imports with API calls
-- Add game persistence and user accounts
-- Offline capability with local storage
+## Mobile Development Workflow
 
-### **Phase 3: Native Mobile** (Future)
-- Evaluate React Native vs Flutter vs staying PWA
-- iOS App Store deployment
-- Push notifications and native features
-- Advanced AI and multiplayer modes
+### **Quick UI Iteration**
+1. Run `cd mobile && npm run web`
+2. Edit `mobile/App.tsx` for UI changes
+3. See changes instantly in browser at http://localhost:8081
+
+### **Device Testing**
+1. Install "Expo Go" app on phone
+2. Run `cd mobile && npx expo start`
+3. Scan QR code to test on real device
+
+### **Native Features**
+- Use iOS Simulator or Android Emulator for platform-specific testing
+- Requires Xcode (macOS) or Android Studio setup
+
+## Current Status
+
+### **✅ Completed**
+- React Native app with TypeScript
+- Complete Yahtzee UI (dice, scorecard, chat)
+- Web browser testing via React Native Web
+- Expo Go device testing setup
+- Core Python game logic
+- Dark theme mobile-first design
+
+### **🔄 In Progress**
+- FastAPI backend integration
+- AI bot API endpoints
+- Game state management
+
+### **📋 Next Steps**
+- Connect mobile app to Python backend
+- Implement Botzee AI chat and gameplay
+- Add haptic feedback and animations
+- App store deployment preparation
 
 ## Architecture Notes
 
-- **Mobile-First**: iPhone 14/15 (390px) primary target
-- Game logic is separated and reusable across desktop/mobile/API
-- Uses pytest for testing, focusing on game logic validation
-- PWA approach allows rapid iteration before native mobile investment
-- Clean architecture enables easy API integration in Phase 2
+- **Mobile-First**: Optimized for iPhone/Android with responsive web fallback
+- **TypeScript**: Full type safety in React Native components
+- **Rapid Iteration**: Browser testing for quick UI development
+- **Device Testing**: Expo Go for real device validation
+- **Clean API**: Separation between frontend and game logic
+- **AI Integration**: Python ML backend with REST API interface

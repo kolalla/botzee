@@ -1,0 +1,15 @@
+{
+  "name": "BotzeeApp",
+  "displayName": "Botzee - AI Yahtzee",
+  "expo": {
+    "name": "Botzee",
+    "slug": "botzee-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "platforms": ["ios", "android", "web"],
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
