@@ -89,6 +89,8 @@ streamlit run ui/app.py
 - Expo Go device testing setup
 - Core Python game logic
 - Dark theme mobile-first design
+- Refined scorecard layout with proper column borders and alignment
+- Improved section headers with multi-line text formatting
 
 ### **🔄 In Progress**
 - FastAPI backend integration

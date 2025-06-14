@@ -270,7 +270,7 @@ const App = () => {
         <View style={styles.scorecard}>
           {/* Combined Header: Player Names and Upper Section */}
           <View style={styles.combinedHeader}>
-            <Text style={styles.sectionTitle}>Upper Section</Text>
+            <Text style={styles.sectionTitle}>Upper{"\n"}Section</Text>
             <View style={styles.playerNamesRow}>
               <Text style={[styles.scorecardHeaderText, styles.scorecardHeaderCenter]}>{currentPlayer === 'Player 1' ? '>' : ''}P1</Text>
               <Text style={[styles.scorecardHeaderText, styles.scorecardHeaderCenter]}>{currentPlayer === 'Player 2' ? '>' : ''}P2</Text>
@@ -290,7 +290,7 @@ const App = () => {
                 return (
                   <TouchableOpacity 
                     key={player}
-                    style={[styles.scoreCell, index === 0 ? styles.firstScoreCell : null]}
+                    style={[styles.scoreCell, index === 0 ? styles.firstScoreCell : null, index < 2 ? styles.scoreCellWithBorder : null]}
                     onPress={() => isCurrentPlayer && score === null && currentDice.length > 0 ? scoreCategory(category.key as ScoreCategory) : null}
                     disabled={!isCurrentPlayer || score !== null || currentDice.length === 0}
                   >
@@ -309,7 +309,7 @@ const App = () => {
               const upperTotal = ['ones', 'twos', 'threes', 'fours', 'fives', 'sixes']
                 .reduce((total, cat) => total + (scores[player][cat as ScoreCategory] || 0), 0);
               return (
-                <View key={player} style={[styles.scoreCell, index === 0 ? styles.firstScoreCell : null]}>
+                <View key={player} style={[styles.scoreCell, index === 0 ? styles.firstScoreCell : null, index < 2 ? styles.scoreCellWithBorder : null]}>
                   <Text style={[styles.scoreValue, styles.actualScore]}>{upperTotal}</Text>
                 </View>
               );
@@ -323,7 +323,7 @@ const App = () => {
                 .reduce((total, cat) => total + (scores[player][cat as ScoreCategory] || 0), 0);
               const bonus = upperTotal >= 63 ? 35 : 0;
               return (
-                <View key={player} style={[styles.scoreCell, index === 0 ? styles.firstScoreCell : null]}>
+                <View key={player} style={[styles.scoreCell, index === 0 ? styles.firstScoreCell : null, index < 2 ? styles.scoreCellWithBorder : null]}>
                   <Text style={[styles.scoreValue, styles.actualScore]}>{bonus}</Text>
                 </View>
               );
@@ -332,7 +332,7 @@ const App = () => {
 
           {/* Lower Section */}
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Lower Section</Text>
+            <Text style={styles.sectionTitle}>Lower{"\n"}Section</Text>
           </View>
 
           {[{name: 'Three of a Kind', key: 'threeOfAKind'}, {name: 'Four of a Kind', key: 'fourOfAKind'}, 
@@ -349,7 +349,7 @@ const App = () => {
                 return (
                   <TouchableOpacity 
                     key={player}
-                    style={[styles.scoreCell, index === 0 ? styles.firstScoreCell : null]}
+                    style={[styles.scoreCell, index === 0 ? styles.firstScoreCell : null, index < 2 ? styles.scoreCellWithBorder : null]}
                     onPress={() => isCurrentPlayer && score === null && currentDice.length > 0 ? scoreCategory(category.key as ScoreCategory) : null}
                     disabled={!isCurrentPlayer || score !== null || currentDice.length === 0}
                   >
@@ -382,7 +382,7 @@ const App = () => {
               const grandTotal = upperTotal + upperBonus + lowerTotal;
               
               return (
-                <View key={player} style={[styles.scoreCell, index === 0 ? styles.firstScoreCell : null]}>
+                <View key={player} style={[styles.scoreCell, index === 0 ? styles.firstScoreCell : null, index < 2 ? styles.scoreCellWithBorder : null]}>
                   <Text style={[styles.scoreValue, styles.grandTotalText, styles.actualScore]}>{grandTotal}</Text>
                 </View>
               );
@@ -553,14 +553,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
   },
   playerNamesRow: {
+    flex: 3,
     flexDirection: 'row',
-    flex: 1,
     justifyContent: 'space-around',
-    marginLeft: 16,
+    alignItems: 'center',
   },
   sectionHeader: {
     backgroundColor: '#e4e1b4',
@@ -573,8 +572,8 @@ const styles = StyleSheet.create({
     color: '#000000',
     fontSize: 20,
     fontFamily: 'PressStart2P_400Regular',
-    flex: 0,
-    minWidth: 200,
+    flex: 2,
+    textAlign: 'left',
   },
   categoryName: {
     color: '#000000',
@@ -587,6 +586,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 8,
+  },
+  scoreCellWithBorder: {
     borderRightWidth: 3,
     borderRightColor: '#000000',
   },
