@@ -442,34 +442,34 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     backgroundColor: '#e4e1b4',
-    padding: 16,
+    padding: 8,
   },
   
   // Action Section (Top)
   actionSection: {
     backgroundColor: '#e4e1b4',
-    borderWidth: 4,
+    borderWidth: 3,
     borderColor: '#000000',
-    padding: 20,
-    marginBottom: 12,
+    padding: 12,
+    marginBottom: 6,
   },
   playerInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 8,
   },
   playerInfoText: {
     color: '#000000',
-    fontSize: 24,
+    fontSize: 16,
     fontFamily: 'PressStart2P_400Regular',
   },
   rollButton: {
     backgroundColor: '#ff0000',
-    borderWidth: 4,
+    borderWidth: 3,
     borderColor: '#000000',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     alignSelf: 'center',
   },
   rollButtonDisabled: {
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
   },
   rollButtonText: {
     color: '#ffffff',
-    fontSize: 28,
+    fontSize: 16,
     fontFamily: 'PressStart2P_400Regular',
   },
 
@@ -492,12 +492,12 @@ const styles = StyleSheet.create({
   diceGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 16,
+    marginTop: 8,
   },
   die: {
-    width: 120,
-    height: 120,
-    borderWidth: 4,
+    width: 70,
+    height: 70,
+    borderWidth: 3,
     borderColor: '#000000',
     backgroundColor: '#ffffff',
     justifyContent: 'center',
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffff00',
   },
   dieText: {
-    fontSize: 48,
+    fontSize: 28,
     color: '#000000',
     fontFamily: 'PressStart2P_400Regular',
   },
@@ -521,9 +521,9 @@ const styles = StyleSheet.create({
   // Scorecard Section (Middle)
   scorecard: {
     backgroundColor: '#e4e1b4',
-    borderWidth: 4,
+    borderWidth: 3,
     borderColor: '#000000',
-    marginBottom: 16,
+    marginBottom: 8,
   },
   scorecardHeader: {
     backgroundColor: '#e4e1b4',
@@ -532,15 +532,15 @@ const styles = StyleSheet.create({
   scorecardRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderBottomWidth: 3,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderBottomWidth: 2,
     borderBottomColor: '#000000',
     backgroundColor: '#e4e1b4',
   },
   scorecardHeaderText: {
     color: '#000000',
-    fontSize: 20,
+    fontSize: 14,
     fontFamily: 'PressStart2P_400Regular',
   },
   scorecardHeaderCenter: {
@@ -548,10 +548,10 @@ const styles = StyleSheet.create({
   },
   combinedHeader: {
     backgroundColor: '#e4e1b4',
-    borderBottomWidth: 4,
+    borderBottomWidth: 3,
     borderBottomColor: '#000000',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -563,21 +563,21 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     backgroundColor: '#e4e1b4',
-    borderBottomWidth: 3,
+    borderBottomWidth: 2,
     borderBottomColor: '#000000',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
+    paddingVertical: 2,
+    paddingHorizontal: 6,
   },
   sectionTitle: {
     color: '#000000',
-    fontSize: 20,
+    fontSize: 14,
     fontFamily: 'PressStart2P_400Regular',
     flex: 2,
     textAlign: 'left',
   },
   categoryName: {
     color: '#000000',
-    fontSize: 18,
+    fontSize: 12,
     fontFamily: 'PressStart2P_400Regular',
     flex: 2,
   },
@@ -585,7 +585,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
+    paddingVertical: 4,
   },
   scoreCellWithBorder: {
     borderRightWidth: 3,
@@ -600,7 +600,7 @@ const styles = StyleSheet.create({
   },
   scoreValue: {
     color: '#000000',
-    fontSize: 18,
+    fontSize: 12,
     fontFamily: 'PressStart2P_400Regular',
     textAlign: 'center',
   },
@@ -619,32 +619,32 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
   },
   grandTotalText: {
-    fontSize: 18,
+    fontSize: 12,
     fontFamily: 'PressStart2P_400Regular',
   },
 
   // Chat Section (Bottom)
   chatContainer: {
     backgroundColor: '#e4e1b4',
-    borderWidth: 4,
+    borderWidth: 3,
     borderColor: '#000000',
-    padding: 20,
-    marginBottom: 16,
+    padding: 12,
+    marginBottom: 8,
   },
   chatTitle: {
     color: '#000000',
-    fontSize: 24,
+    fontSize: 16,
     fontFamily: 'PressStart2P_400Regular',
-    marginBottom: 16,
+    marginBottom: 8,
   },
   chatMessages: {
     backgroundColor: '#ffffff',
-    borderWidth: 3,
+    borderWidth: 2,
     borderColor: '#000000',
-    padding: 16,
-    marginBottom: 16,
-    height: 200,
-    maxHeight: 200,
+    padding: 8,
+    marginBottom: 8,
+    height: 120,
+    maxHeight: 120,
   },
   chatMessage: {
     color: '#000000',
@@ -684,7 +684,7 @@ const styles = StyleSheet.create({
   },
   sendButtonText: {
     color: '#ffffff',
-    fontSize: 18,
+    fontSize: 12,
     fontFamily: 'PressStart2P_400Regular',
   },
 });

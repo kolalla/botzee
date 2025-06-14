@@ -20,7 +20,9 @@
       "Bash(npx expo install:*)",
       "Bash(npm run web:*)",
       "Bash(npx expo start:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }
