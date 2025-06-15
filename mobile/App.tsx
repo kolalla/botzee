@@ -227,6 +227,12 @@ const App = () => {
         
         {/* Action Section (Top) */}
         <View style={styles.actionSection}>
+          {/* Overlay for score selection */}
+          {rollsLeft === 0 && currentDice.length > 0 && (
+            <View style={styles.scoreOverlay}>
+              <Text style={styles.scoreOverlayText}>{currentPlayer}, choose your score!</Text>
+            </View>
+          )}
           {/* Top Row: Player Info and Roll Button */}
           <View style={styles.playerInfo}>
             <Text style={styles.playerInfoText}>{currentPlayer}</Text>
@@ -236,10 +242,10 @@ const App = () => {
               disabled={rollsLeft === 0}
             >
               <Text style={styles.rollButtonText}>
-                {!gameStarted ? 'Roll Dice' : rollsLeft > 0 ? 'Next Roll' : 'Choose Score'}
+                {!gameStarted ? 'Roll' : rollsLeft > 0 ? 'Roll' : 'Choose Score'}
               </Text>
             </TouchableOpacity>
-            <Text style={styles.playerInfoText}>ROLLS: {rollsLeft}</Text>
+            <Text style={styles.playerInfoText}>Rolls: {rollsLeft}</Text>
           </View>
           
           {/* Dice Grid */}
@@ -272,9 +278,15 @@ const App = () => {
           <View style={styles.combinedHeader}>
             <Text style={styles.sectionTitle}>Upper{"\n"}Section</Text>
             <View style={styles.playerNamesRow}>
-              <Text style={[styles.scorecardHeaderText, styles.scorecardHeaderCenter]}>{currentPlayer === 'Player 1' ? '>' : ''}P1</Text>
-              <Text style={[styles.scorecardHeaderText, styles.scorecardHeaderCenter]}>{currentPlayer === 'Player 2' ? '>' : ''}P2</Text>
-              <Text style={[styles.scorecardHeaderText, styles.scorecardHeaderCenter]}>{currentPlayer === 'Botzee' ? '>' : ''}BOT</Text>
+              <View style={[styles.playerNameContainer, currentPlayer === 'Player 1' ? styles.currentPlayerName : null]}>
+                <Text style={[styles.scorecardHeaderText, styles.scorecardHeaderCenter]}>P1</Text>
+              </View>
+              <View style={[styles.playerNameContainer, currentPlayer === 'Player 2' ? styles.currentPlayerName : null]}>
+                <Text style={[styles.scorecardHeaderText, styles.scorecardHeaderCenter]}>P2</Text>
+              </View>
+              <View style={[styles.playerNameContainer, currentPlayer === 'Botzee' ? styles.currentPlayerName : null]}>
+                <Text style={[styles.scorecardHeaderText, styles.scorecardHeaderCenter]}>BOT</Text>
+              </View>
             </View>
           </View>
           
@@ -621,6 +633,37 @@ const styles = StyleSheet.create({
   grandTotalText: {
     fontSize: 12,
     fontFamily: 'PressStart2P_400Regular',
+  },
+  
+  // Score overlay styles
+  scoreOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 40,
+    backgroundColor: 'rgba(255, 0, 0, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+    borderBottomWidth: 3,
+    borderBottomColor: '#000000',
+  },
+  scoreOverlayText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontFamily: 'PressStart2P_400Regular',
+  },
+  
+  // Player name highlight styles
+  playerNameContainer: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  currentPlayerName: {
+    borderWidth: 2,
+    borderColor: '#ff0000',
+    backgroundColor: 'rgba(255, 0, 0, 0.1)',
   },
 
   // Chat Section (Bottom)
