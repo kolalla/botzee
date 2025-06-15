@@ -8,6 +8,9 @@ import {
   View,
   TouchableOpacity,
   TextInput,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useRef } from 'react';
 import { useFonts, PressStart2P_400Regular } from '@expo-google-fonts/press-start-2p';
@@ -43,6 +46,7 @@ const App = () => {
   const [selectedDice, setSelectedDice] = useState<number[]>([]);
   const [gameStarted, setGameStarted] = useState(false);
   const [chatInput, setChatInput] = useState('');
+  const [showChat, setShowChat] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
       id: '1',
@@ -51,7 +55,8 @@ const App = () => {
       timestamp: new Date()
     }
   ]);
-  const chatScrollRef = useRef<ScrollView>(null);
+  const chatInputRef = useRef<TextInput>(null);
+  const flatListRef = useRef<FlatList>(null);
 
   // Scorecard state
   const [scores, setScores] = useState<{[player: string]: PlayerScores}>({
@@ -192,7 +197,7 @@ const App = () => {
     
     // Scroll to bottom after player message
     setTimeout(() => {
-      chatScrollRef.current?.scrollToEnd({ animated: true });
+      flatListRef.current?.scrollToEnd({ animated: true });
     }, 100);
     
     // Add Botzee response after a short delay
@@ -207,12 +212,33 @@ const App = () => {
       
       // Scroll to bottom after Botzee response
       setTimeout(() => {
-        chatScrollRef.current?.scrollToEnd({ animated: true });
+        flatListRef.current?.scrollToEnd({ animated: true });
       }, 100);
     }, 500);
   };
 
-  // Show all messages but auto-scroll to bottom
+  const openChat = () => {
+    setShowChat(true);
+    setTimeout(() => {
+      chatInputRef.current?.focus();
+    }, 100);
+  };
+
+  const closeChat = () => {
+    setShowChat(false);
+    setChatInput('');
+  };
+
+  const renderChatMessage = ({ item }: { item: ChatMessage }) => (
+    <View style={styles.messageContainer}>
+      <Text style={[
+        styles.chatMessage,
+        item.sender === 'player' ? styles.playerMessage : styles.botzeeMessage
+      ]}>
+        {item.sender === 'botzee' ? 'Botzee: ' : 'You: '}{item.text}
+      </Text>
+    </View>
+  );
 
   if (!fontsLoaded) {
     return null;
@@ -402,44 +428,63 @@ const App = () => {
           </View>
         </View>
 
-        {/* Chat Section (Bottom) */}
-        <View style={styles.chatContainer}>
-          <Text style={styles.chatTitle}>Botzee Chat</Text>
-          <ScrollView 
-            ref={chatScrollRef}
-            style={styles.chatMessages}
-            showsVerticalScrollIndicator={false}
-            onContentSizeChange={() => chatScrollRef.current?.scrollToEnd({ animated: true })}
-          >
-            {chatMessages.map((message) => (
-              <Text key={message.id} style={[
-                styles.chatMessage,
-                message.sender === 'player' ? styles.playerMessage : styles.botzeeMessage
-              ]}>
-                {message.sender === 'botzee' ? 'Bot: ' : 'You: '}{message.text}
-              </Text>
-            ))}
-          </ScrollView>
-          <View style={styles.chatInputContainer}>
-            <TextInput
-              style={styles.chatInput}
-              placeholder="Ask Bot..."
-              placeholderTextColor="#666666"
-              value={chatInput}
-              onChangeText={setChatInput}
-              onSubmitEditing={sendMessage}
-              returnKeyType="send"
-            />
-            <TouchableOpacity 
-              style={styles.sendButton}
-              onPress={sendMessage}
-            >
-              <Text style={styles.sendButtonText}>Send</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        {/* Chat Button (Bottom) */}
+        {!showChat && (
+          <TouchableOpacity style={styles.chatButton} onPress={openChat}>
+            <Text style={styles.chatButtonText}>Chat with Botzee!</Text>
+          </TouchableOpacity>
+        )}
 
       </ScrollView>
+
+      {/* Full Screen Chat Window */}
+      {showChat && (
+        <KeyboardAvoidingView 
+          style={styles.chatOverlay}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+        >
+          <View style={styles.chatWindow}>
+            <View style={styles.chatHeader}>
+              <Text style={styles.chatHeaderTitle}>Chat with Botzee</Text>
+              <TouchableOpacity style={styles.closeButton} onPress={closeChat}>
+                <Text style={styles.closeButtonText}>×</Text>
+              </TouchableOpacity>
+            </View>
+            
+            <FlatList
+              ref={flatListRef}
+              data={chatMessages}
+              renderItem={renderChatMessage}
+              keyExtractor={(item) => item.id}
+              style={styles.chatMessagesList}
+              contentContainerStyle={styles.chatMessagesContent}
+              showsVerticalScrollIndicator={false}
+              onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+            />
+            
+            <View style={styles.chatInputContainer}>
+              <TextInput
+                ref={chatInputRef}
+                style={styles.chatInput}
+                placeholder="Ask Botzee..."
+                placeholderTextColor="#666666"
+                value={chatInput}
+                onChangeText={setChatInput}
+                onSubmitEditing={sendMessage}
+                returnKeyType="send"
+                multiline={false}
+              />
+              <TouchableOpacity 
+                style={styles.sendButton}
+                onPress={sendMessage}
+              >
+                <Text style={styles.sendButtonText}>Send</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      )}
     </SafeAreaView>
   );
 };
@@ -666,63 +711,120 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 0, 0, 0.1)',
   },
 
-  // Chat Section (Bottom)
-  chatContainer: {
-    backgroundColor: '#e4e1b4',
+  // Chat Button (Bottom)
+  chatButton: {
+    backgroundColor: '#00ff00',
     borderWidth: 3,
     borderColor: '#000000',
-    padding: 12,
+    padding: 16,
     marginBottom: 8,
+    alignItems: 'center',
   },
-  chatTitle: {
+  chatButtonText: {
     color: '#000000',
     fontSize: 16,
     fontFamily: 'PressStart2P_400Regular',
-    marginBottom: 8,
   },
-  chatMessages: {
-    backgroundColor: '#ffffff',
+
+  // Full Screen Chat Window
+  chatOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    justifyContent: 'flex-end',
+  },
+  chatWindow: {
+    backgroundColor: '#e4e1b4',
+    borderTopWidth: 3,
+    borderTopColor: '#000000',
+    height: '80%',
+    paddingTop: 0,
+  },
+  chatHeader: {
+    backgroundColor: '#e4e1b4',
+    borderBottomWidth: 3,
+    borderBottomColor: '#000000',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  chatHeaderTitle: {
+    color: '#000000',
+    fontSize: 16,
+    fontFamily: 'PressStart2P_400Regular',
+  },
+  closeButton: {
+    backgroundColor: '#ff0000',
     borderWidth: 2,
     borderColor: '#000000',
-    padding: 8,
-    marginBottom: 8,
-    height: 120,
-    maxHeight: 120,
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    color: '#ffffff',
+    fontSize: 20,
+    fontFamily: 'PressStart2P_400Regular',
+    lineHeight: 20,
+  },
+  chatMessagesList: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+    marginHorizontal: 12,
+    marginTop: 12,
+    borderWidth: 2,
+    borderColor: '#000000',
+  },
+  chatMessagesContent: {
+    padding: 12,
+  },
+  messageContainer: {
+    marginVertical: 4,
   },
   chatMessage: {
     color: '#000000',
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'PressStart2P_400Regular',
-    marginBottom: 8,
-    lineHeight: 24,
+    lineHeight: 20,
   },
   playerMessage: {
     textAlign: 'right',
+    color: '#0066cc',
   },
   botzeeMessage: {
     textAlign: 'left',
+    color: '#cc6600',
   },
   chatInputContainer: {
     flexDirection: 'row',
-    gap: 16,
+    padding: 12,
+    gap: 12,
+    backgroundColor: '#e4e1b4',
   },
   chatInput: {
     flex: 1,
     backgroundColor: '#ffffff',
     borderWidth: 3,
     borderColor: '#000000',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     color: '#000000',
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'PressStart2P_400Regular',
+    maxHeight: 100,
   },
   sendButton: {
     backgroundColor: '#ff0000',
     borderWidth: 3,
     borderColor: '#000000',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     justifyContent: 'center',
   },
   sendButtonText: {
